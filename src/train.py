@@ -21,6 +21,18 @@ def plot_losses(train_losses, val_losses):
     pass
 
 def validate(model, dataset, config, criterion):
+    """
+        Validate the model on random batches
+
+        Args:
+            model: model to evaluate
+            dataset: validation data to get the random batch from
+            config: Hyperparameters
+            criterion: loss function
+
+        Returns:
+            validation loss per validation batch
+    """
     model.eval()
     val_loss = 0
     num_val_batch = 10 # using 10 batches for validation
@@ -41,13 +53,25 @@ def validate(model, dataset, config, criterion):
     model.train()
     return val_loss / num_val_batch
 
-def train_model(model, optimizer, dataset, config, start_epoch=0):
+def train_model(model, optimizer, dataset, config, start_epoch=0, train_losses=None, val_losses=None):
+    """
+        Train the model on dataset and plot the loss
+
+        Args:
+            model: model to be trained
+            optimizer: minimize the loss
+            dataset: training data
+            config: hyperparameters
+            start_epoch: starting epochs, default is 0 and custom for resuming
+            train_losses, val_losses: loss history
+
+    """
     model.train()
     criterion = nn.CrossEntropyLoss()
 
-    # Tracking losses
-    train_losses = []
-    val_losses = []
+    # incase the history loss is None
+    train_losses = train_losses if train_losses else []
+    val_losses = val_losses if val_losses else []
 
     print("Training Started")
     for epoch in range(start_epoch, config.NUM_EPOCHS):
@@ -63,33 +87,31 @@ def train_model(model, optimizer, dataset, config, start_epoch=0):
             output, hidden = model(x, hidden)
             hidden = (hidden[0].detach(), hidden[1].detach())
 
-            # calculation of loss
+            # calculation of loss, backprop and weight update
             loss = criterion(output, y.view(-1))
-
-            # backprop
             optimizer.zero_grad()
             loss.backward()
-            torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=5) # avoid exploding gradient
-            optimizer.step() # update weights
+            # avoiding backprop through entire training history
+            torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=5)
+            optimizer.step()
 
             epoch_loss += loss.item()
 
-        # calculation of average training loss
+        # calculation of average training loss and validation losses
         avg_train_loss = epoch_loss / config.NUM_BATCH_PER_EPOCH
         train_losses.append(avg_train_loss)
-
-        # calculation of average validation loss
         avg_val_loss = validate(model, dataset, config, criterion)
         val_losses.append(avg_val_loss)
 
         # Print progress and save checkpoint every 10 epochs
-        if (epoch + 1) % 10 == 0:
+        if (epoch + 1) % 5 == 0:
             print(f"Epoch [{epoch+1}/{config.NUM_EPOCHS}], Train_Loss: {avg_train_loss:.4f}, Val_loss : {avg_val_loss}")
             # save checkpoints
-            save_checkpoint(
-                model, optimizer, epoch, avg_train_loss, avg_val_loss,
-                filepath = f'{config.CHECKPOINT_DIR}/checkpoint_epoch_{epoch+1}.pth'
-            )
+            if (epoch + 1) % 10 == 0:
+                save_checkpoint(
+                    model, optimizer, epoch, avg_train_loss, avg_val_loss,
+                    filepath = f'{config.CHECKPOINT_DIR}/checkpoint_epoch_{epoch+1}.pth'
+                )
 
     # Plot the losses
     plot_losses(train_losses, val_losses)

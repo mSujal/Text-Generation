@@ -29,8 +29,12 @@ def main(args):
         if args.mode == 'train': # fresh train
             train_model(model=model, optimizer=optimizer, dataset=dataset, config=config, start_epoch=0)
         elif args.mode == 'resume': # continue training
-            start_epoch, _, _ = load_checkpoint(model, optimizer, filepath=config.CHECKPOINT_PATH)
-            train_model(model=model, optimizer=optimizer, dataset=dataset, config=config, start_epoch=start_epoch)
+            if not os.path.exists(config.CHECKPOINT_PATH):
+                train_model(model=model, optimizer=optimizer, dataset=dataset, config=config, start_epoch=0)
+            else:
+                start_epoch, _, _, train_losses, val_losses = load_checkpoint(model, optimizer, filepath=config.CHECKPOINT_PATH)
+                train_model(model=model, optimizer=optimizer, dataset=dataset, config=config, start_epoch=start_epoch,
+                            train_losses=train_losses, val_losses=val_losses)
 
     elif args.mode == 'eval': # if --mode eval generate the text
         if os.path.exists(config.CHECKPOINT_PATH): # if saved checkpoint exists call the checkpoint to generate
@@ -50,6 +54,14 @@ def main(args):
             training = input("Train the model? (y/n): ").lower().strip()
             if training in ['y', 'yes']:
                 train_model(model=model, optimizer=optimizer, dataset=dataset, config=config, start_epoch=0)
+                model.eval()
+                topics = ["Love", "Death", "Time", "Freedom", "Truth"]
+                for topic in topics:
+                    print(f"\n{'=' * 50}")
+                    print(f"Topic : {topic}")
+                    print("=" * 50)
+                    generated = generate_philosophy(model, dataset, prompt=f"{topic}: ", length=200, temperature=0.8)
+                    print(generated)
             else:
                 print("No trained model\nExiting...")
                 return 0
