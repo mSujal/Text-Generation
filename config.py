@@ -2,11 +2,11 @@
 
 import torch
 
-# Data
-DATA_PATH = 'data/dataset.txt'
+# Paths
+DATA_PATH = 'data/dataset_tiny.txt'
 CHECKPOINT_DIR = 'checkpoints/'
-CHECKPOINT_PATH = 'checkpoints/checkpoint_epoch_20.pth'
-
+CHECKPOINT_PATH = 'checkpoints/checkpoint_epochs_200_tiny.pth'
+SAVE_LOSS_PATH = 'loss_plot.png'
 
 # Model
 EMBED_SIZE = 128
@@ -18,12 +18,9 @@ DROPOUT = 0.3
 BATCH_SIZE = 64
 SEQ_LENGTH = 100
 LEARNING_RATE = 0.01
-NUM_EPOCHS = 35
-NUM_BATCH_PER_EPOCH = 1
+NUM_EPOCHS = 205
+NUM_BATCH_PER_EPOCH = 10
 
-# Generation
-GENERATION_LENGTH = 200
-TEMPERATURE = 0.8
 
 # Device
 DEVICE = 'cuda' if torch.cuda.is_available() else 'cpu'

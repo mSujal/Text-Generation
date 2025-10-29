@@ -6,7 +6,7 @@ import config
 from src.utils import save_checkpoint
 import matplotlib.pyplot as plt
 
-def plot_losses(train_losses, val_losses):
+def plot_losses(train_losses, val_losses, save_path=config.SAVE_LOSS_PATH):
     """Plot the losses for visualization"""
     fig, ax = plt.subplots(figsize=(10, 6))
     ax.plot(range(len(train_losses)), train_losses, label="Train Loss")
@@ -17,8 +17,7 @@ def plot_losses(train_losses, val_losses):
 
     plt.legend()
     plt.grid(True)
-    plt.show()
-    pass
+    plt.savefig(save_path)
 
 def validate(model, dataset, config, criterion):
     """
@@ -70,8 +69,10 @@ def train_model(model, optimizer, dataset, config, start_epoch=0, train_losses=N
     criterion = nn.CrossEntropyLoss()
 
     # incase the history loss is None
-    train_losses = train_losses if train_losses else []
-    val_losses = val_losses if val_losses else []
+    if train_losses is None:
+        train_losses = []
+    if val_losses is None:
+        val_losses = val_losses if val_losses else []
 
     print("Training Started")
     for epoch in range(start_epoch, config.NUM_EPOCHS):
