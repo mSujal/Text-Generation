@@ -1,8 +1,7 @@
-"""TRAINING THE MODEL"""
+"""TRAINING AND EVALUATING THE MODEL"""
 
 import torch
 import torch.nn as nn
-import torch.optim as optim
 import config
 from utils import save_checkpoint
 import matplotlib.pyplot as plt
@@ -42,10 +41,9 @@ def validate(model, dataset, config, criterion):
     model.train()
     return val_loss / num_val_batch
 
-def train_model(model, dataset, config, start_epoch=0):
+def train_model(model, optimizer, dataset, config, start_epoch=0):
     model.train()
     criterion = nn.CrossEntropyLoss()
-    optimizer = optim.Adam(model.parameters(), lr=config.LEARNING_RATE)
 
     # Tracking losses
     train_losses = []

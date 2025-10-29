@@ -1,14 +1,16 @@
 """MAIN SCRIPT"""
-from tkinter import PhotoImage
 
+import torch
+import os
 import config
+import argparse
 from src.model import PhilosophyLSTM
 from src.data_utils import TextData
 from src.train import train_model
 from src.utils import load_checkpoint
 from src.generate import generate_philosophy
 
-def main():
+def main(args):
     # Load the data
     dataset = TextData(config.DATA_PATH)
     print(f"vocab size :  {dataset.vocab_size}")
@@ -21,21 +23,43 @@ def main():
         config.NUM_LAYERS,
     ).to(config.DEVICE)
 
-    # try loading the checkpoint if available
-    start_epoch, _ = load_checkpoint(model, None, 'checkpoints/latest.pth')
-    
-    # train the model
-    train_model(model, dataset, config, start_epoch)
+    optimizer = torch.optim.Adam(model.parameters(), lr=config.LEARNING_RATE)
 
-    # generate the text
-    # text prompts
-    topics = ["Love", "Death", "Time", "Freedom", "Truth"]
-    for topic in topics:
-        print(f"\n{'='*50}")
-        print(f"Topic : {topic}")
-        print("="*50)
-        generated = generate_philosophy(model, dataset, prompt=f"{topic}: ", length=200, temperature=0.8)
-        print(generated)
+    if args.mode in ['train', 'resume']: # if --mode train or --mode resume train the mode from scratch or resume
+        if args.mode == 'train': # fresh train
+            train_model(model=model, optimizer=optimizer, dataset=dataset, config=config, start_epoch=0)
+        elif args.mode == 'resume': # continue training
+            start_epoch, _, _ = load_checkpoint(model, optimizer, filepath=config.CHECKPOINT_PATH)
+            train_model(model=model, optimizer=optimizer, dataset=dataset, config=config, start_epoch=0)
+
+    elif args.mode == 'eval': # if --mode eval generate the text
+        if os.path.exists(config.CHECKPOINT_PATH): # if saved checkpoint exists call the checkpoint to generate
+            load_checkpoint(model=model, optimizer=None, filepath=config.CHECKPOINT_PATH)
+            model.eval() # set to evaluation mode
+            # generate the text
+            # text prompts
+            topics = ["Love", "Death", "Time", "Freedom", "Truth"]
+            for topic in topics:
+                print(f"\n{'=' * 50}")
+                print(f"Topic : {topic}")
+                print("=" * 50)
+                generated = generate_philosophy(model, dataset, prompt=f"{topic}: ", length=200, temperature=0.8)
+                print(generated)
+        else: # no saved checkpoints available
+            print("No checkpoints found in directory")
+            training = input("Train the model? (y/n): ").lower().strip()
+            if training in ['y', 'yes']:
+                train_model(model=model, optimizer=optimizer, dataset=dataset, config=config, start_epoch=0)
+            else:
+                print("No trained model\nExiting...")
+                return 0
 
 if __name__ == "__main__":
-    main()
+    parser = argparse.ArgumentParser(description="Philosophy LSTM Text Generation")
+    parser.add_argument('--mode',
+                        choices=['train', 'resume', 'eval'],
+                        default='resume',
+                        help="train:  from scratch | resume: resume from checkpoint | eval: evaluate model or generate"
+                        )
+    args = parser.parse_args()
+    main(args)

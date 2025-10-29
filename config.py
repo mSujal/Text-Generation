@@ -1,11 +1,11 @@
 """HYPERPARAMETERS"""
 
-# Data
 import torch
 
+# Data
 DATA_PATH = '../data/dataset.txt'
 CHECKPOINT_DIR = 'checkpoints/'
-
+CHECKPOINT_PATH = 'checkpoints/latest.pth'
 # Model
 EMBED_SIZE = 128
 HIDDEN_SIZE = 256
@@ -16,8 +16,8 @@ DROPOUT = 0.3
 BATCH_SIZE = 64
 SEQ_LENGTH = 100
 LEARNING_RATE = 0.002
-NUM_EPOCHS = 200
-NUM_BATCHES_PER_EPOCHS = 20
+NUM_EPOCHS = 2 # for checking the flow 
+NUM_BATCHES_PER_EPOCHS = 1 # for checking the flow 
 
 # Generation
 GENERATION_LENGTH = 200

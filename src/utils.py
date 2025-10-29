@@ -19,7 +19,7 @@ def save_checkpoint(model, optimizer, epoch, train_loss, val_loss, filepath=conf
     torch.save(checkpoint, filepath)
     print(f"checkpoint saved: {filepath}")
 
-def load_checkpoint(model, optimizer, filepath=config.CHECKPOINT_DIR):
+def load_checkpoint(model, optimizer, filepath=config.CHECKPOINT_PATH):
     """Load model checkpoint"""
     if not os.path.exists(filepath):
         print("No checkpoints found, starting fresh")
