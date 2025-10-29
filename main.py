@@ -30,7 +30,7 @@ def main(args):
             train_model(model=model, optimizer=optimizer, dataset=dataset, config=config, start_epoch=0)
         elif args.mode == 'resume': # continue training
             start_epoch, _, _ = load_checkpoint(model, optimizer, filepath=config.CHECKPOINT_PATH)
-            train_model(model=model, optimizer=optimizer, dataset=dataset, config=config, start_epoch=0)
+            train_model(model=model, optimizer=optimizer, dataset=dataset, config=config, start_epoch=start_epoch)
 
     elif args.mode == 'eval': # if --mode eval generate the text
         if os.path.exists(config.CHECKPOINT_PATH): # if saved checkpoint exists call the checkpoint to generate

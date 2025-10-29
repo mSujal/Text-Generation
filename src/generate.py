@@ -9,7 +9,7 @@ def generate_philosophy(model, dataset, prompt, length=200, temperature=0.8):
     with torch.no_grad():
         hidden = model.init_hidden(1, config.DEVICE)
         input_seq = torch.tensor(
-            [dataset.char_to_idx[ch] for ch in prompt],
+            [dataset.ch_to_idx[ch] for ch in prompt],
             dtype=torch.long
         ).unsqueeze(0).to(config.DEVICE)
 
@@ -26,7 +26,7 @@ def generate_philosophy(model, dataset, prompt, length=200, temperature=0.8):
             output = output / temperature # controls the randomness of generated text
             probs = torch.softmax(output, dim=1)
             next_idx = torch.multinomial(probs,1).item()
-            generated += dataset.idx_to_char[next_idx]
+            generated += dataset.idx_to_ch[next_idx]
             input_char = torch.tensor([[next_idx]], dtype=torch.long, device=config.DEVICE)
 
     model.train()

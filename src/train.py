@@ -3,7 +3,7 @@
 import torch
 import torch.nn as nn
 import config
-from utils import save_checkpoint
+from src.utils import save_checkpoint
 import matplotlib.pyplot as plt
 
 def plot_losses(train_losses, val_losses):
@@ -55,7 +55,7 @@ def train_model(model, optimizer, dataset, config, start_epoch=0):
         epoch_loss = 0
 
         # training loop
-        for batch_idx in range(config.NUME_BATCH_PER_EPOCH):
+        for batch_idx in range(config.NUM_BATCH_PER_EPOCH):
             x, y = dataset.get_batch(config.BATCH_SIZE, config.SEQ_LENGTH)
             x, y = x.to(config.DEVICE), y.to(config.DEVICE)
 
@@ -75,7 +75,7 @@ def train_model(model, optimizer, dataset, config, start_epoch=0):
             epoch_loss += loss.item()
 
         # calculation of average training loss
-        avg_train_loss = epoch_loss / config.NUME_BATCH_PER_EPOCH
+        avg_train_loss = epoch_loss / config.NUM_BATCH_PER_EPOCH
         train_losses.append(avg_train_loss)
 
         # calculation of average validation loss

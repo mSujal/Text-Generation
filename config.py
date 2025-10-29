@@ -3,9 +3,9 @@
 import torch
 
 # Data
-DATA_PATH = '../data/dataset.txt'
+DATA_PATH = 'data/dataset.txt'
 CHECKPOINT_DIR = 'checkpoints/'
-CHECKPOINT_PATH = 'checkpoints/latest.pth'
+CHECKPOINT_PATH = 'checkpoints/checkpoint_epoch_10.pth'
 # Model
 EMBED_SIZE = 128
 HIDDEN_SIZE = 256
@@ -16,8 +16,8 @@ DROPOUT = 0.3
 BATCH_SIZE = 64
 SEQ_LENGTH = 100
 LEARNING_RATE = 0.002
-NUM_EPOCHS = 2 # for checking the flow 
-NUM_BATCHES_PER_EPOCHS = 1 # for checking the flow 
+NUM_EPOCHS = 20 # for checking the flow
+NUM_BATCH_PER_EPOCH = 1 # for checking the flow
 
 # Generation
 GENERATION_LENGTH = 200
