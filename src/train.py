@@ -105,7 +105,7 @@ def train_model(model, optimizer, dataset, config, start_epoch=0, train_losses=N
         val_losses.append(avg_val_loss)
 
         # Print progress and save checkpoint every 10 epochs
-        if (epoch + 1) % 5 == 0:
+        if (epoch + 1) % 2 == 0:
             print(f"Epoch [{epoch+1}/{config.NUM_EPOCHS}], Train_Loss: {avg_train_loss:.4f}, Val_loss : {avg_val_loss}")
             # save checkpoints
             if (epoch + 1) % 10 == 0:
